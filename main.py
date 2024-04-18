@@ -12,15 +12,16 @@ import json
 
 def run():
 
-    STUDY_NAME = "vgg11_cifar10_dual_late"
+    STUDY_NAME = "reduced_vgg11_cifar10_dual_late"
 
-    model = "STCNN"
+    model = "ReducedVGG11"
     DUAL_INPUT = True
-    merge_at = "late"
+    merge_at = "early"
 
-    RUN_TRAIN = False
+    RUN_TRAIN = True
     RUN_TEST = True
-    STORE_MODEL = False
+    RUN_SINGLE_TEST = False
+    STORE_MODEL = True
 
     # Dataset
     number_of_data_batches = 5 # Unit: 10000 training images
@@ -47,19 +48,21 @@ def run():
             model = models.DualSTCNN(input_size=cifar10_dataset[0][0].shape, num_classes=len(cifar10_dataset.classes), merge_at=merge_at)
         elif model == "VGG11":
             model = models.DualVGG11(input_size=cifar10_dataset[0][0].shape, num_classes=len(cifar10_dataset.classes), merge_at=merge_at)
+        elif model == "ReducedVGG11":
+            model = models.DualReducedVGG11(input_size=cifar10_dataset[0][0].shape, num_classes=len(cifar10_dataset.classes), merge_at=merge_at)
         elif model == "VGG16":
             model = models.DualVGG16(input_size=cifar10_dataset[0][0].shape, num_classes=len(cifar10_dataset.classes), merge_at=merge_at)
-        else:
-            raise ValueError("Model not found")
+
     else:
         if model == "STCNN":
             model = models.STCNN(input_size=cifar10_dataset[0][0].shape, num_classes=len(cifar10_dataset.classes))
         elif model == "VGG11":
             model = models.VGG11(input_size=cifar10_dataset[0][0].shape, num_classes=len(cifar10_dataset.classes))
+        elif model == "ReducedVGG11":
+            model = models.ReducedVGG11(input_size=cifar10_dataset[0][0].shape, num_classes=len(cifar10_dataset.classes))
         elif model == "VGG16":
             model = models.VGG16(input_size=cifar10_dataset[0][0].shape, num_classes=len(cifar10_dataset.classes))
-        else:
-            raise ValueError("Model not found")
+
         
     loss_fn = nn.CrossEntropyLoss()
     optimizer = Adam(model.parameters(), lr=0.001)
@@ -72,7 +75,6 @@ def run():
         run_train(model, loss_fn, optimizer, train_data, DUAL_INPUT, device, batch_size, epochs)
 
     # Test run
-    RUN_SINGLE_TEST = True
     index_if_single_test = 1
 
     if RUN_TEST:
@@ -113,7 +115,7 @@ def run_test(model, loss_fn, test_data, cifar10_dataset, DUAL_INPUT, device, is_
         model.eval()
     else:
         test_data = [test_data[index]]
-        test_loader = DataLoader(test_data, batch_size=1, shuffle=True)
+        test_loader = DataLoader(test_data, batch_size=1, shuffle=False)
         model.to(device)
         model.eval()
 
