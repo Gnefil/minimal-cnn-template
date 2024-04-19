@@ -3,25 +3,41 @@ import dataset
 import torch
 import torch.nn as nn
 from torchvision import transforms
-from torchvision.io import read_image
 from torch.optim import Adam
 from torch.utils.data import DataLoader, Subset
-from torchsummary import summary
 import os
 import json
 
 def run():
+    """
+    STUDY_NAME: Name of the study, will be used to create a folder to store the results
 
-    STUDY_NAME = "reduced_vgg11_cifar10_dual_late"
+    model: Model to be used. Options: "STCNN", "VGG11", "ReducedVGG11", "VGG16"
 
-    model = "ReducedVGG11"
+    DUAL_INPUT: If True, the dataset and model will change to output/input two images. If False, they act as standard models.
+
+    merge_at: If DUAL_INPUT is True, this parameter will determine where the two inputs will be merged. Options: "early", "late", "during_stn" (STCNN only).
+
+    RUN_TRAIN: If True, the model will be trained. Normally False, not used for testing purposes.
+
+    RUN_TEST: If True, the model will be tested. Normally True to test whether the model is working.
+
+    RUN_SINGLE_TEST: If True, the model will test only one image. Normally True used to test the model on a single image.
+
+    STORE_MODEL: If True, the model will be stored in the results folder. Normally False, as the model is not trained properly.
+    """
+
+    STUDY_NAME = "test"
+
+    model = "VGG16"
     DUAL_INPUT = True
-    merge_at = "early"
+    merge_at = "late"
 
-    RUN_TRAIN = True
+
+    RUN_TRAIN = False
     RUN_TEST = True
-    RUN_SINGLE_TEST = False
-    STORE_MODEL = True
+    RUN_SINGLE_TEST = True
+    STORE_MODEL = False
 
     # Dataset
     number_of_data_batches = 5 # Unit: 10000 training images
